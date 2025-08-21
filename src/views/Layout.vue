@@ -17,8 +17,9 @@
                         <el-icon><House /></el-icon>
                         <span>首页</span>
                     </el-menu-item>
-                    <el-sub-menu>
+                    <el-sub-menu index="/books-management">
                         <template #title>
+                            <el-icon><Management /></el-icon>
                             <span>图书管理</span>
                         </template>
                         <el-menu-item index="/books">书籍管理</el-menu-item>
