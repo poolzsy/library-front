@@ -150,18 +150,17 @@ const resetForm = () => {
 
 const handleSubmit = async () => {
     if (!formRef.value) return;
-
     try {
         await formRef.value.validate();
-        const url = form.id ? `/user/update` : '/user/save';
+        const url = form.id ? `/user/update` : '/user/save'; 
         const method = form.id ? 'put' : 'post';
+        
         await request[method](url, form);
-
         ElMessage.success(form.id ? '更新成功' : '新增成功');
         dialogVisible.value = false;
         fetchData();
     } catch (error) {
-        console.log('表单校验未通过或请求失败', error);
+        console.error('操作失败:', error);
     }
 };
 
