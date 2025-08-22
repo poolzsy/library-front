@@ -17,6 +17,14 @@
                         <el-icon><House /></el-icon>
                         <span>首页</span>
                     </el-menu-item>
+                    <el-sub-menu index="/users-management">
+                        <template #title>
+                            <el-icon><User /></el-icon>
+                            <span>用户管理</span>
+                        </template>
+                        <el-menu-item index="/user">用户列表</el-menu-item>
+                        <el-menu-item index="1">角色管理</el-menu-item>
+                    </el-sub-menu>
                     <el-sub-menu index="/books-management">
                         <template #title>
                             <el-icon><Management /></el-icon>

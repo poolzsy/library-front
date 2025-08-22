@@ -1,84 +1,69 @@
 <template>
     <div class="home-container">
-        <!-- 筛选/搜索区域 -->
-        <div class="filter-card">
-            <el-input v-model="params.name" placeholder="请输入姓名" style="width: 240px; margin-right: 15px;" clearable />
-            <el-input v-model="params.phone" placeholder="请输入联系方式" style="width: 240px; margin-right: 15px;"
-                clearable />
-            <el-button type="primary" @click="handleSearch">查询</el-button>
-        </div>
-        <!-- 表格和分页区域 -->
-        <div class="table-card">
-            <el-table :data="tableData" stripe v-loading="loading">
-                <el-table-column label="姓名" prop="name" />
-                <el-table-column label="年龄" prop="age" />
-                <el-table-column label="地址" prop="address" />
-                <el-table-column label="联系方式" prop="phone" />
-                <el-table-column label="性别" prop="gender" />
-            </el-table>
+        <el-card class="welcome-card" shadow="never">
+            <h1 class="welcome-title">欢迎使用图书管理系统！</h1>
+            <p class="welcome-text">在这里，您可以轻松管理系统中的图书、作者和用户信息。祝您工作愉快！</p>
+        </el-card>
 
-            <div class="pagination-container">
-                <el-pagination background v-model:current-page="params.pageNum" v-model:page-size="params.pageSize"
-                    :page-sizes="[5, 10, 15, 20]" layout="total, sizes, prev, pager, next, jumper" :total="total"
-                    @size-change="handleSizeChange" @current-change="handlePageChange" />
-            </div>
-        </div>
+        <el-row :gutter="20" class="stats-card-row">
+            <el-col :span="8">
+                <el-card class="stats-card" shadow="hover">
+                    <div class="card-icon-wrapper bg-blue">
+                        <el-icon><Collection /></el-icon>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-title">图书总量</div>
+                        <div class="stats-number">{{ totalBooks }}</div>
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :span="8">
+                <el-card class="stats-card" shadow="hover">
+                    <div class="card-icon-wrapper bg-green">
+                        <el-icon><User /></el-icon>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-title">用户总数</div>
+                        <div class="stats-number">{{ totalUsers }}</div>
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :span="8">
+                <el-card class="stats-card" shadow="hover">
+                    <div class="card-icon-wrapper bg-orange">
+                        <el-icon><Avatar /></el-icon>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-title">作者数量</div>
+                        <div class="stats-number">{{ totalAuthors }}</div>
+                    </div>
+                </el-card>
+            </el-col>
+        </el-row>
+        
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
-import request from '../utils/request';
+import { ref, onMounted } from 'vue';
+import { Collection, User, Avatar } from '@element-plus/icons-vue';
 
-const tableData = ref([]);
-const total = ref(0);
-const loading = ref(false);
-const params = reactive({
-    pageNum: 1,
-    pageSize: 10,
-    name: '',
-    phone: ''
-});
-
-const fetchData = async () => {
-    loading.value = true;
-    try {
-        const responseData = await request.get('/user/page', { params: params });
-        
-        if (responseData && responseData.rows) {
-            tableData.value = responseData.rows;
-            total.value = responseData.total;
-        } else {
-            tableData.value = [];
-            total.value = 0;
-        }
-    } catch (error) {
-        console.error('获取数据失败:', error);
-        tableData.value = [];
-        total.value = 0;
-    } finally {
-        loading.value = false;
-    }
-};
-
-const handleSearch = () => {
-    params.pageNum = 1;
-    fetchData();
-};
-
-const handleSizeChange = () => {
-    params.pageNum = 1;
-    fetchData();
-};
-
-const handlePageChange = () => {
-    fetchData();
+const totalBooks = ref(0);
+const totalUsers = ref(0);
+const totalAuthors = ref(0);
+const fetchStatsData = () => {
+    setTimeout(() => {
+        totalBooks.value = Math.floor(Math.random() * 1000) + 500;
+        totalUsers.value = Math.floor(Math.random() * 200) + 50;
+        totalAuthors.value = Math.floor(Math.random() * 100) + 20;
+    }, 500);
 };
 
 onMounted(() => {
-    fetchData();
+    fetchStatsData();
 });
 </script>
+
 <style scoped>
 @import "../style/Home.css";
 </style>
