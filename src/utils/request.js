@@ -10,7 +10,7 @@ service.interceptors.response.use(
     response => {
         const res = response.data;
         if (res.code === 200 || response.status === 200) {
-            return res.data;
+            return res;
         } else {
             ElMessage.error(res.message || 'Error');
             return Promise.reject(new Error(res.message || 'Error'));
