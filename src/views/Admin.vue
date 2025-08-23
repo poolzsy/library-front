@@ -5,29 +5,21 @@
             <el-input v-model="params.name" placeholder="请输入姓名" style="width: 240px; margin-right: 15px;" clearable />
             <el-input v-model="params.phone" placeholder="请输入联系方式" style="width: 240px; margin-right: 15px;"
                 clearable />
+            <el-input v-model="params.email" placeholder="请输入邮箱" style="width: 240px; margin-right: 15px;"
+                clearable />
             <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
             <el-button :icon="Refresh" @click="handleReset">重置</el-button>
         </div>
 
         <!-- 表格和分页区域 -->
         <div class="table-card">
-            <el-button type="primary" :icon="Plus" @click="handleAdd" style="margin-bottom: 20px;">新增用户</el-button>
+            <el-button type="primary" :icon="Plus" @click="handleAdd" style="margin-bottom: 20px;">新增管理员</el-button>
             <el-table :data="tableData" stripe v-loading="loading">
-                <el-table-column label="姓名" prop="name" />
-                <el-table-column label="会员号" prop="cardId" />
-                <el-table-column label="年龄" prop="age" />
-                <el-table-column label="地址" prop="address" />
+                <el-table-column label="用户名" prop="userName" />
                 <el-table-column label="联系方式" prop="phone" />
-                <el-table-column label="性别" prop="gender">
-                    <template #default="scope">
-                        <span>{{ scope.row.gender === '0' ? '男' : '女' }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="会员" prop="isMember">
-                    <template #default="scope">
-                        <span>{{ scope.row.isMember === '1' ? '是' : '否' }}</span>
-                    </template>
-                </el-table-column>
+                <el-table-column label="邮箱" prop="email" />
+                <el-table-column label="创建时间" prop="createTime" />
+                <el-table-column label="更新时间" prop="updateTime" />
                 <el-table-column label="操作" width="180px" fixed="right">
                     <template #default="scope">
                         <el-button type="primary" size="small" :icon="Edit"
@@ -48,34 +40,16 @@
         <!-- 表单 -->
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="35%" @close="resetForm">
             <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
-                <el-form-item label="姓名" prop="name">
-                    <el-input v-model="form.name" placeholder="请输入姓名" />
-                </el-form-item>
-
-                <el-form-item label="性别" prop="gender">
-                    <el-radio-group v-model="form.gender">
-                        <el-radio label="0">男</el-radio>
-                        <el-radio label="1">女</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-
-                <el-form-item label="会员" prop="isMember">
-                    <el-radio-group v-model="form.isMember">
-                        <el-radio label="1">是</el-radio>
-                        <el-radio label="0">否</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-
-                <el-form-item label="年龄" prop="age">
-                    <el-input-number v-model="form.age" :min="1" :max="120" style="width: 180px;" />
+                <el-form-item label="用户名" prop="userName">
+                    <el-input v-model="form.userName" placeholder="请输入用户名" />
                 </el-form-item>
 
                 <el-form-item label="联系方式" prop="phone">
                     <el-input v-model="form.phone" placeholder="请输入联系方式" />
                 </el-form-item>
 
-                <el-form-item label="地址" prop="address">
-                    <el-input v-model="form.address" type="textarea" placeholder="请输入地址" />
+                <el-form-item label="邮箱" prop="email">
+                    <el-input v-model="form.email" placeholder="请输入邮箱" />
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -101,7 +75,8 @@ const params = reactive({
     pageNum: 1,
     pageSize: 10,
     name: '',
-    phone: ''
+    phone: '',
+    email: ''
 });
 
 const dialogVisible = ref(false);
@@ -110,13 +85,9 @@ const formRef = ref(null);
 
 const getInitialForm = () => ({
     id: null,
-    cardId: '',
-    name: '',
-    age: undefined,
-    address: '',
-    phone: '',
-    gender: '',
-    isMember: ''
+    userName: '',
+    email: '',
+    phone: ''
 });
 const form = reactive(getInitialForm());
 
@@ -133,16 +104,15 @@ const validatePhone = (rule, value, callback) => {
 };
 
 const rules = reactive({
-    name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-    gender: [{ required: true, message: '请选择性别', trigger: 'change' }],
-    age: [{ required: true, message: '请输入年龄', trigger: 'blur' }],
+    userName: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+    email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
     phone: [{ required: true, validator: validatePhone, trigger: 'blur' }],
 });
 
 const fetchData = async () => {
     loading.value = true;
     try {
-        const res = await request.get('/user/page', { params: params });
+        const res = await request.get('/admin/page', { params: params });
         tableData.value = res.data?.rows || [];
         total.value = res.data?.total || 0;
     } catch (error) {
@@ -162,9 +132,9 @@ const handleSubmit = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value.validate();
-        const url = form.id ? `/user/update` : '/user/save'; 
+        const url = form.id ? `/admin/update` : '/admin/save';
         const method = form.id ? 'put' : 'post';
-        
+
         await request[method](url, form);
         ElMessage.success(form.id ? '更新成功' : '新增成功');
         dialogVisible.value = false;
@@ -176,13 +146,13 @@ const handleSubmit = async () => {
 
 const handleAdd = () => {
     resetForm();
-    dialogTitle.value = '新增用户';
+    dialogTitle.value = '新增管理员';
     dialogVisible.value = true;
 };
 
 const handleEdit = (row) => {
     resetForm();
-    dialogTitle.value = '编辑用户';
+    dialogTitle.value = '编辑管理员';
     Object.assign(form, JSON.parse(JSON.stringify(row)));
     dialogVisible.value = true;
 };
@@ -198,7 +168,7 @@ const handleDelete = (id) => {
         }
     ).then(async () => {
         try {
-            await request.delete(`/user/delete/${id}`);
+            await request.delete(`/admin/delete/${id}`);
             ElMessage.success('删除成功');
             fetchData();
         } catch (error) {
